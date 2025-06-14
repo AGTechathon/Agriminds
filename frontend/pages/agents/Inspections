@@ -1,1 +1,234 @@
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { 
+  Search, Filter, Eye, CheckCircle, X, Clock, 
+  Calendar, Package, User, MapPin, Camera, FileText
+} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
+import { Select } from '../../components/ui/Select';
+import { Textarea } from '../../components/ui/Textarea';
+import { StatusBadge } from '../../components/ui/StatusBadge';
+import { Badge } from '../../components/ui/Badge';
+import { useCropsStore } from '../../store/cropsStore';
+import { useAuthStore } from '../../store/authStore';
 
+export const Inspections: React.FC = () => {
+  const { user } = useAuthStore();
+  const { crops, updateCropStatus, addQualityReport } = useCropsStore();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('newest');
+  const [selectedCrop, setSelectedCrop] = useState<string | null>(null);
+  const [inspectionData, setInspectionData] = useState({
+    weight: '',
+    size: '',
+    condition: '',
+    notes: '',
+    recommendation: 'approve' as 'approve' | 'reject',
+  });
+
+  // Filter crops that need inspection or have been inspected
+  const inspectionCrops = crops.filter(crop => 
+    crop.status === 'pending' || crop.status === 'inspected' || crop.status === 'approved' || crop.status === 'rejected'
+  );
+
+  // Apply filters
+  const filteredCrops = inspectionCrops.filter(crop => {
+    const matchesSearch = crop.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         crop.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || crop.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  // Sort crops
+  const sortedCrops = [...filteredCrops].sort((a, b) => {
+    switch (sortBy) {
+      case 'name':
+        return a.name.localeCompare(b.name);
+      case 'status':
+        return a.status.localeCompare(b.status);
+      case 'harvest':
+        return new Date(b.harvestDate).getTime() - new Date(a.harvestDate).getTime();
+      case 'newest':
+      default:
+        return 0; // In real app, would sort by submission date
+    }
+  });
+
+  const getInspectionStats = () => {
+    return {
+      total: inspectionCrops.length,
+      pending: inspectionCrops.filter(c => c.status === 'pending').length,
+      inspected: inspectionCrops.filter(c => c.status === 'inspected').length,
+      approved: inspectionCrops.filter(c => c.status === 'approved').length,
+      rejected: inspectionCrops.filter(c => c.status === 'rejected').length,
+    };
+  };
+
+  const stats = getInspectionStats();
+
+  const handleStartInspection = (cropId: string) => {
+    setSelectedCrop(cropId);
+    setInspectionData({
+      weight: '',
+      size: '',
+      condition: '',
+      notes: '',
+      recommendation: 'approve',
+    });
+  };
+
+  const handleSubmitInspection = () => {
+    if (!selectedCrop || !user) return;
+
+    const crop = crops.find(c => c.id === selectedCrop);
+    if (!crop) return;
+
+    // Create quality report
+    const qualityReport = {
+      id: `qr${Date.now()}`,
+      cropId: selectedCrop,
+      agentId: user.id,
+      date: new Date(),
+      weight: parseFloat(inspectionData.weight) || crop.quantity,
+      size: inspectionData.size,
+      condition: inspectionData.condition,
+      images: crop.images, // In real app, would upload new inspection images
+      notes: inspectionData.notes,
+      recommendation: inspectionData.recommendation,
+    };
+
+    addQualityReport(qualityReport);
+    
+    // Update crop status based on recommendation
+    const newStatus = inspectionData.recommendation === 'approve' ? 'approved' : 'rejected';
+    updateCropStatus(selectedCrop, newStatus);
+
+    setSelectedCrop(null);
+  };
+
+  const selectedCropData = selectedCrop ? crops.find(c => c.id === selectedCrop) : null;
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Quality Inspections</h1>
+        <p className="text-gray-600 mt-1">Inspect and verify crop quality for marketplace listing</p>
+      </div>
+
+      {/* Stats Overview */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-700">{stats.total}</div>
+              <div className="text-sm text-gray-500">Total Inspections</div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-amber-700">{stats.pending}</div>
+              <div className="text-sm text-gray-500">Pending</div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-700">{stats.inspected}</div>
+              <div className="text-sm text-gray-500">Inspected</div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-700">{stats.approved}</div>
+              <div className="text-sm text-gray-500">Approved</div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-red-700">{stats.rejected}</div>
+              <div className="text-sm text-gray-500">Rejected</div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filters */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <Input
+                type="text"
+                placeholder="Search crops..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+                fullWidth
+              />
+            </div>
+
+            <Select
+              options={[
+                { value: 'all', label: 'All Status' },
+                { value: 'pending', label: 'Pending Inspection' },
+                { value: 'inspected', label: 'Inspected' },
+                { value: 'approved', label: 'Approved' },
+                { value: 'rejected', label: 'Rejected' },
+              ]}
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full md:w-48"
+            />
+
+            <Select
+              options={[
+                { value: 'newest', label: 'Newest First' },
+                { value: 'name', label: 'Name A-Z' },
+                { value: 'status', label: 'Status' },
+                { value: 'harvest', label: 'Harvest Date' },
+              ]}
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="w-full md:w-48"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Inspections List */}
+      {sortedCrops.length > 0 ? (
+        <div className="space-y-4">
+          {sortedCrops.map((crop, index) => (
+            <motion.div
+              key={crop.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
+            >
+              <Card className="hover:shadow-lg transition-shadow duration-300">
+                <CardContent className="p-4 md:p-6">
+                  <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+                    {/* Crop Image */}
+                    <div className="w-full lg:w-24 h-48 lg:h-24 overflow-hidden rounded-lg flex-shrink-0">
+                      <img
+                        src={crop.images[0] || 'https://images.pexels.com/photos/601798/pexels-photo-601798.jpeg'}
+                        alt={crop.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
