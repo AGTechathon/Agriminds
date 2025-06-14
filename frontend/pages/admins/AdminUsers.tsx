@@ -11,7 +11,6 @@ import { Select } from '../../components/ui/Select';
 import { Badge } from '../../components/ui/Badge';
 import { useAuthStore } from '../../store/authStore';
 
-// Mock users data - in a real app, this would come from an API
 const mockUsers = [
   {
     id: 'f1',
@@ -74,7 +73,6 @@ export const AdminUsers: React.FC = () => {
   const [sortBy, setSortBy] = useState('newest');
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
 
-  // Apply filters
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -84,7 +82,6 @@ export const AdminUsers: React.FC = () => {
     return matchesSearch && matchesRole && matchesStatus;
   });
 
-  // Sort users
   const sortedUsers = [...filteredUsers].sort((a, b) => {
     switch (sortBy) {
       case 'name':
@@ -117,7 +114,6 @@ export const AdminUsers: React.FC = () => {
   };
 
   const handleUpdateUserStatus = (userId: string, newStatus: string) => {
-    // In a real app, this would call an API
     console.log('Updating user status:', userId, newStatus);
   };
 
@@ -144,13 +140,11 @@ export const AdminUsers: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
         <p className="text-gray-600 mt-1">Manage all platform users and their permissions</p>
       </div>
 
-      {/* Stats Overview */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <Card>
           <CardContent className="p-4">
@@ -207,7 +201,6 @@ export const AdminUsers: React.FC = () => {
         </Card>
       </div>
 
-      {/* Filters */}
       <Card>
         <CardContent className="p-4">
           <div className="flex flex-col md:flex-row gap-4">
@@ -263,7 +256,6 @@ export const AdminUsers: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Users List */}
       {sortedUsers.length > 0 ? (
         <div className="space-y-4">
           {sortedUsers.map((user, index) => (
@@ -276,14 +268,12 @@ export const AdminUsers: React.FC = () => {
               <Card className="hover:shadow-lg transition-shadow duration-300">
                 <CardContent className="p-4 md:p-6">
                   <div className="flex flex-col lg:flex-row lg:items-center gap-4">
-                    {/* User Avatar */}
                     <div className="flex-shrink-0">
                       <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
                         <User className="h-8 w-8 text-gray-600" />
                       </div>
                     </div>
 
-                    {/* User Info */}
                     <div className="flex-1">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3">
                         <div>
@@ -341,7 +331,6 @@ export const AdminUsers: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Role-specific stats */}
                       {user.role === 'farmer' && (
                         <div className="mt-3 p-3 bg-green-50 rounded-lg">
                           <div className="flex items-center justify-between text-sm">
@@ -382,7 +371,6 @@ export const AdminUsers: React.FC = () => {
                       )}
                     </div>
 
-                    {/* Actions */}
                     <div className="flex flex-row lg:flex-col gap-2 lg:w-32">
                       <Button
                         variant="outline"
@@ -423,7 +411,6 @@ export const AdminUsers: React.FC = () => {
         </Card>
       )}
 
-      {/* User Details Modal */}
       {selectedUser && selectedUserData && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -442,7 +429,6 @@ export const AdminUsers: React.FC = () => {
               </div>
 
               <div className="space-y-6">
-                {/* Basic Information */}
                 <div>
                   <h3 className="font-medium text-gray-900 mb-3">Basic Information</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -491,7 +477,6 @@ export const AdminUsers: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Actions */}
                 <div>
                   <h3 className="font-medium text-gray-900 mb-3">Actions</h3>
                   <div className="grid grid-cols-2 gap-3">
