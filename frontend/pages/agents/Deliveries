@@ -124,3 +124,93 @@ export const Deliveries: React.FC = () => {
         <h1 className="text-2xl font-bold text-gray-900">Delivery Management</h1>
         <p className="text-gray-600 mt-1">Coordinate and track crop deliveries to buyers</p>
       </div>
+
+      {/* Stats Overview */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-700">{stats.total}</div>
+              <div className="text-sm text-gray-500">Total Deliveries</div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-amber-700">{stats.pending}</div>
+              <div className="text-sm text-gray-500">Pending Assignment</div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-700">{stats.assigned}</div>
+              <div className="text-sm text-gray-500">Assigned</div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-orange-700">{stats.inTransit}</div>
+              <div className="text-sm text-gray-500">In Transit</div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-700">{stats.delivered}</div>
+              <div className="text-sm text-gray-500">Delivered</div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+     {/* Filters */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <Input
+                type="text"
+                placeholder="Search orders, crops, or buyers..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+                fullWidth
+              />
+            </div>
+
+            <Select
+              options={[
+                { value: 'all', label: 'All Status' },
+                { value: 'confirmed', label: 'Pending Assignment' },
+                { value: 'assigned', label: 'Assigned' },
+                { value: 'in-transit', label: 'In Transit' },
+                { value: 'delivered', label: 'Delivered' },
+              ]}
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full md:w-48"
+            />
+
+            <Select
+              options={[
+                { value: 'newest', label: 'Newest First' },
+                { value: 'amount', label: 'Amount High-Low' },
+                { value: 'status', label: 'Status' },
+              ]}
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="w-full md:w-48"
+            />
+          </div>
+        </CardContent>
+      </Card>
