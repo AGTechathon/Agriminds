@@ -295,3 +295,157 @@ export const AdminOrders: React.FC = () => {
           </CardContent>
         </Card>
       )}
+      {/* Order Management Modal */}
+      {selectedOrder && selectedOrderData && selectedCrop && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">Order Management</h2>
+                  <p className="text-gray-600">#{selectedOrderData.id}</p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  icon={<X size={16} />}
+                  onClick={() => setSelectedOrder(null)}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Order Details */}
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="font-medium text-gray-900 mb-3">Order Information</h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Order ID:</span>
+                        <span className="font-medium">#{selectedOrderData.id.substring(0, 8)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Crop:</span>
+                        <span className="font-medium">{selectedCrop.name}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Buyer ID:</span>
+                        <span className="font-medium">{selectedOrderData.buyerId.substring(0, 8)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Order Date:</span>
+                        <span className="font-medium">{new Date(selectedOrderData.createdAt).toLocaleDateString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Total Amount:</span>
+                        <span className="font-semibold text-green-700">${selectedOrderData.totalAmount.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Current Status:</span>
+                        <StatusBadge status={selectedOrderData.status} />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="font-medium text-gray-900 mb-3">Status Management</h3>
+                    <div className="space-y-3">
+                      <Select
+                        label="Update Order Status"
+                        options={[
+                          { value: 'pending', label: 'Pending' },
+                          { value: 'confirmed', label: 'Confirmed' },
+                          { value: 'in-transit', label: 'In Transit' },
+                          { value: 'delivered', label: 'Delivered' },
+                        ]}
+                        value={selectedOrderData.status}
+                        onChange={(e) => handleUpdateStatus(selectedOrderData.id, e.target.value)}
+                        fullWidth
+                      />
+                      
+                      <div className="grid grid-cols-2 gap-3">
+                        <Button
+                          variant="success"
+                          size="sm"
+                          icon={<CheckCircle size={14} />}
+                          onClick={() => handleUpdateStatus(selectedOrderData.id, 'confirmed')}
+                          fullWidth
+                        >
+                          Confirm Order
+                        </Button>
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          icon={<Truck size={14} />}
+                          onClick={() => handleUpdateStatus(selectedOrderData.id, 'in-transit')}
+                          fullWidth
+                        >
+                          Mark In Transit
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Crop Details */}
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="font-medium text-gray-900 mb-3">Crop Details</h3>
+                    <div className="flex items-start space-x-4">
+                      <img
+                        src={selectedCrop.images[0] || 'https://images.pexels.com/photos/601798/pexels-photo-601798.jpeg'}
+                        alt={selectedCrop.name}
+                        className="w-20 h-20 object-cover rounded-lg"
+                      />
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-900">{selectedCrop.name}</h4>
+                        <p className="text-gray-600 text-sm">{selectedCrop.description}</p>
+                        <div className="mt-2 space-y-1 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-500">Quantity:</span>
+                            <span className="font-medium">{selectedCrop.quantity} {selectedCrop.unit}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-500">Price:</span>
+                            <span className="font-medium">${selectedCrop.price} / {selectedCrop.unit}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-500">Harvest Date:</span>
+                            <span className="font-medium">{new Date(selectedCrop.harvestDate).toLocaleDateString()}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="font-medium text-gray-900 mb-3">Payment Information</h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Payment Status:</span>
+                        <Badge variant={selectedOrderData.paymentStatus === 'fully-paid' ? 'success' : 'warning'}>
+                          {selectedOrderData.paymentStatus.replace('-', ' ').toUpperCase()}
+                        </Badge>
+                      </div>
+                      {selectedOrderData.advanceAmount && (
+                        <>
+                          <div className="flex justify-between">
+                            <span className="text-gray-500">Advance Paid:</span>
+                            <span className="font-medium">${selectedOrderData.advanceAmount.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-500">Balance Due:</span>
+                            <span className="font-medium">${(selectedOrderData.totalAmount - selectedOrderData.advanceAmount).toFixed(2)}</span>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
