@@ -23,10 +23,10 @@ export const MyOrders: React.FC = () => {
   const [sortBy, setSortBy] = useState('newest');
   const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
 
-  // Get buyer's orders
+  
   const buyerOrders = user ? orders.filter(order => order.buyerId === user.id) : [];
 
-  // Apply filters
+
   const filteredOrders = buyerOrders.filter(order => {
     const crop = crops.find(c => c.id === order.cropId);
     const matchesSearch = crop?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -35,7 +35,7 @@ export const MyOrders: React.FC = () => {
     return matchesSearch && matchesStatus;
   });
 
-  // Sort orders
+
   const sortedOrders = [...filteredOrders].sort((a, b) => {
     switch (sortBy) {
       case 'amount':
@@ -77,7 +77,7 @@ export const MyOrders: React.FC = () => {
 
   const handleCancelOrder = (orderId: string) => {
     if (window.confirm('Are you sure you want to cancel this order?')) {
-      // In a real app, this would call an API
+     
       console.log('Cancelling order:', orderId);
     }
   };
@@ -87,13 +87,13 @@ export const MyOrders: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+     
       <div>
         <h1 className="text-2xl font-bold text-gray-900">My Orders</h1>
         <p className="text-gray-600 mt-1">Track your crop orders and delivery status</p>
       </div>
 
-      {/* Stats Overview */}
+ 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <Card>
           <CardContent className="p-4">
@@ -150,7 +150,7 @@ export const MyOrders: React.FC = () => {
         </Card>
       </div>
 
-      {/* Filters */}
+   
       <Card>
         <CardContent className="p-4">
           <div className="flex flex-col md:flex-row gap-4">
@@ -190,7 +190,7 @@ export const MyOrders: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Orders List */}
+     
       {sortedOrders.length > 0 ? (
         <div className="space-y-4">
           {sortedOrders.map((order, index) => {
@@ -259,7 +259,7 @@ export const MyOrders: React.FC = () => {
                         )}
                       </div>
 
-                      {/* Actions */}
+           
                       <div className="flex flex-row sm:flex-col gap-2 lg:w-32">
                         <Button
                           variant="outline"
@@ -284,7 +284,7 @@ export const MyOrders: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Progress Indicator */}
+           
                     <div className="mt-6 pt-4 border-t">
                       <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
                         <span>Order Progress</span>
@@ -338,7 +338,7 @@ export const MyOrders: React.FC = () => {
         </Card>
       )}
 
-      {/* Order Details Modal */}
+
       {selectedOrder && selectedOrderData && selectedCrop && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -374,7 +374,7 @@ export const MyOrders: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Order Information */}
+          
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <h4 className="font-medium text-gray-900 mb-3">Order Information</h4>
@@ -423,7 +423,7 @@ export const MyOrders: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Delivery Tracking */}
+           
                 <div>
                   <h4 className="font-medium text-gray-900 mb-3">Delivery Tracking</h4>
                   <div className="space-y-3">
