@@ -1,1 +1,126 @@
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { 
+  Search, Filter, Eye, Truck, Package, CheckCircle, 
+  Calendar, DollarSign, User, MapPin, Clock, Navigation
+} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
+import { Select } from '../../components/ui/Select';
+import { Textarea } from '../../components/ui/Textarea';
+import { StatusBadge } from '../../components/ui/StatusBadge';
+import { Badge } from '../../components/ui/Badge';
+import { useOrdersStore } from '../../store/ordersStore';
+import { useCropsStore } from '../../store/cropsStore';
+import { useAuthStore } from '../../store/authStore';
 
+export const Deliveries: React.FC = () => {
+  const { user } = useAuthStore();
+  const { orders, updateOrderStatus, addTransportLog } = useOrdersStore();
+  const { crops } = useCropsStore();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('newest');
+  const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
+  const [deliveryData, setDeliveryData] = useState({
+    status: 'assigned' as 'assigned' | 'loaded' | 'in-transit' | 'delivered',
+    notes: '',
+    pickupDate: '',
+    deliveryDate: '',
+  });
+
+  // Filter orders that are assigned for delivery
+  const deliveryOrders = orders.filter(order => 
+    order.status === 'confirmed' || order.status === 'assigned' || 
+    order.status === 'in-transit' || order.status === 'delivered'
+  );
+
+  // Apply filters
+  const filteredOrders = deliveryOrders.filter(order => {
+    const crop = crops.find(c => c.id === order.cropId);
+    const matchesSearch = crop?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         order.buyerId.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  // Sort orders
+  const sortedOrders = [...filteredOrders].sort((a, b) => {
+    switch (sortBy) {
+      case 'amount':
+        return b.totalAmount - a.totalAmount;
+      case 'status':
+        return a.status.localeCompare(b.status);
+      case 'newest':
+      default:
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    }
+  });
+
+  const getDeliveryStats = () => {
+    return {
+      total: deliveryOrders.length,
+      assigned: deliveryOrders.filter(o => o.status === 'assigned').length,
+      inTransit: deliveryOrders.filter(o => o.status === 'in-transit').length,
+      delivered: deliveryOrders.filter(o => o.status === 'delivered').length,
+      pending: deliveryOrders.filter(o => o.status === 'confirmed').length,
+    };
+  };
+
+  const stats = getDeliveryStats();
+
+  const handleManageDelivery = (orderId: string) => {
+    const order = orders.find(o => o.id === orderId);
+    if (order) {
+      setSelectedOrder(orderId);
+      setDeliveryData({
+        status: order.status as any,
+        notes: '',
+        pickupDate: '',
+        deliveryDate: '',
+      });
+    }
+  };
+
+  const handleUpdateDelivery = () => {
+    if (!selectedOrder || !user) return;
+
+    // Create transport log
+    const transportLog = {
+      id: `tl${Date.now()}`,
+      orderId: selectedOrder,
+      cropId: orders.find(o => o.id === selectedOrder)?.cropId || '',
+      agentId: user.id,
+      status: deliveryData.status,
+      pickupDate: deliveryData.pickupDate ? new Date(deliveryData.pickupDate) : undefined,
+      deliveryDate: deliveryData.deliveryDate ? new Date(deliveryData.deliveryDate) : undefined,
+      notes: deliveryData.notes,
+    };
+
+    addTransportLog(transportLog);
+    updateOrderStatus(selectedOrder, deliveryData.status);
+    setSelectedOrder(null);
+  };
+
+  const selectedOrderData = selectedOrder ? orders.find(o => o.id === selectedOrder) : null;
+  const selectedCrop = selectedOrderData ? crops.find(c => c.id === selectedOrderData.cropId) : null;
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'confirmed': return <Clock className="h-4 w-4" />;
+      case 'assigned': return <User className="h-4 w-4" />;
+      case 'in-transit': return <Truck className="h-4 w-4" />;
+      case 'delivered': return <CheckCircle className="h-4 w-4" />;
+      default: return <Package className="h-4 w-4" />;
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Delivery Management</h1>
+        <p className="text-gray-600 mt-1">Coordinate and track crop deliveries to buyers</p>
+      </div>
