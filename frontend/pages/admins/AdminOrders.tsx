@@ -21,7 +21,6 @@ export const AdminOrders: React.FC = () => {
   const [sortBy, setSortBy] = useState('newest');
   const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
 
-  // Apply filters
   const filteredOrders = orders.filter(order => {
     const crop = crops.find(c => c.id === order.cropId);
     const matchesSearch = crop?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -31,7 +30,6 @@ export const AdminOrders: React.FC = () => {
     return matchesSearch && matchesStatus;
   });
 
-  // Sort orders
   const sortedOrders = [...filteredOrders].sort((a, b) => {
     switch (sortBy) {
       case 'amount':
@@ -133,7 +131,6 @@ export const AdminOrders: React.FC = () => {
         </Card>
       </div>
 
-      {/* Filters */}
       <Card>
         <CardContent className="p-4">
           <div className="flex flex-col md:flex-row gap-4">
@@ -176,7 +173,6 @@ export const AdminOrders: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Orders List */}
       {sortedOrders.length > 0 ? (
         <div className="space-y-4">
           {sortedOrders.map((order, index) => {
@@ -253,7 +249,6 @@ export const AdminOrders: React.FC = () => {
                         )}
                       </div>
 
-                      {/* Actions */}
                       <div className="flex flex-row lg:flex-col gap-2 lg:w-32">
                         <Button
                           variant="outline"
@@ -295,7 +290,6 @@ export const AdminOrders: React.FC = () => {
           </CardContent>
         </Card>
       )}
-      {/* Order Management Modal */}
       {selectedOrder && selectedOrderData && selectedCrop && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
@@ -386,7 +380,6 @@ export const AdminOrders: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Crop Details */}
                 <div className="space-y-6">
                   <div>
                     <h3 className="font-medium text-gray-900 mb-3">Crop Details</h3>
