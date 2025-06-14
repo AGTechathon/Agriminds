@@ -214,3 +214,112 @@ export const Deliveries: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+ {/* Deliveries List */}
+      {sortedOrders.length > 0 ? (
+        <div className="space-y-4">
+          {sortedOrders.map((order, index) => {
+            const crop = crops.find(c => c.id === order.cropId);
+            return (
+              <motion.div
+                key={order.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
+              >
+                <Card className="hover:shadow-lg transition-shadow duration-300">
+                  <CardContent className="p-4 md:p-6">
+                    <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+                      {/* Order Info */}
+                      <div className="flex-1">
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3">
+                          <div>
+                            <h3 className="text-lg font-semibold text-gray-900">
+                              Order #{order.id.substring(0, 8)}
+                            </h3>
+                            <p className="text-gray-600">{crop?.name || 'Unknown Crop'}</p>
+                          </div>
+                          <StatusBadge status={order.status} />
+                        </div>
+
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                          <div className="flex items-center">
+                            <DollarSign className="h-4 w-4 text-gray-400 mr-2" />
+                            <div>
+                              <p className="text-gray-500">Amount</p>
+                              <p className="font-semibold">${order.totalAmount.toFixed(2)}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center">
+                            <Calendar className="h-4 w-4 text-gray-400 mr-2" />
+                            <div>
+                              <p className="text-gray-500">Order Date</p>
+                              <p className="font-medium">{new Date(order.createdAt).toLocaleDateString()}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center">
+                            <User className="h-4 w-4 text-gray-400 mr-2" />
+                            <div>
+                              <p className="text-gray-500">Buyer ID</p>
+                              <p className="font-medium">{order.buyerId.substring(0, 8)}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center">
+                            <Package className="h-4 w-4 text-gray-400 mr-2" />
+                            <div>
+                              <p className="text-gray-500">Quantity</p>
+                              <p className="font-medium">{crop?.quantity} {crop?.unit}</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {order.advanceAmount && (
+                          <div className="mt-3 p-3 bg-green-50 rounded-lg">
+                            <p className="text-sm text-green-800">
+                              <strong>Payment:</strong> ${order.advanceAmount.toFixed(2)} advance paid
+                              <span className="ml-2 text-green-600">
+                                (Balance: ${(order.totalAmount - order.advanceAmount).toFixed(2)})
+                              </span>
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex flex-row lg:flex-col gap-2 lg:w-32">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          icon={<Eye size={14} />}
+                          fullWidth
+                        >
+                          View Details
+                        </Button>
+                        
+                        {(order.status === 'confirmed' || order.status === 'assigned' || order.status === 'in-transit') && (
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            icon={<Truck size={14} />}
+                            onClick={() => handleManageDelivery(order.id)}
+                            fullWidth
+                          >
+                            Manage Delivery
+                          </Button>
+                        )}
+
+                        {order.status === 'delivered' && (
+                          <Button
+                            variant="success"
+                            size="sm"
+                            icon={<CheckCircle size={14} />}
+                            fullWidth
+                          >
+                            Completed
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+
