@@ -19,7 +19,7 @@ export const CropSubmissions: React.FC = () => {
   const [sortBy, setSortBy] = useState('newest');
   const [selectedCrop, setSelectedCrop] = useState<string | null>(null);
 
-  // Apply filters
+  
   const filteredCrops = crops.filter(crop => {
     const matchesSearch = crop.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          crop.description?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -27,7 +27,7 @@ export const CropSubmissions: React.FC = () => {
     return matchesSearch && matchesStatus;
   });
 
-  // Sort crops
+
   const sortedCrops = [...filteredCrops].sort((a, b) => {
     switch (sortBy) {
       case 'name':
