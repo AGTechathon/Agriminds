@@ -322,4 +322,199 @@ export const Deliveries: React.FC = () => {
                         )}
                       </div>
                     </div>
+ {/* Progress Indicator */}
+                    <div className="mt-6 pt-4 border-t">
+                      <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
+                        <span>Delivery Progress</span>
+                        <span>{order.status.replace('-', ' ').toUpperCase()}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        {['confirmed', 'assigned', 'in-transit', 'delivered'].map((status, idx) => {
+                          const isActive = ['confirmed', 'assigned', 'in-transit', 'delivered'].indexOf(order.status) >= idx;
+                          const isCurrent = order.status === status;
+                          return (
+                            <React.Fragment key={status}>
+                              <div className={`flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-full border-2 ${
+                                isActive 
+                                  ? isCurrent 
+                                    ? 'bg-blue-600 border-blue-600 text-white' 
+                                    : 'bg-green-600 border-green-600 text-white'
+                                  : 'border-gray-300 text-gray-300'
+                              }`}>
+                                {getStatusIcon(status)}
+                              </div>
+                              {idx < 3 && (
+                                <div className={`flex-1 h-1 ${
+                                  ['confirmed', 'assigned', 'in-transit', 'delivered'].indexOf(order.status) > idx
+                                    ? 'bg-green-600' 
+                                    : 'bg-gray-300'
+                                }`} />
+                              )}
+                            </React.Fragment>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
+        </div>
+      ) : (
+        <Card>
+          <CardContent className="p-12 text-center">
+            <Truck className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No deliveries found</h3>
+            <p className="text-gray-500">
+              {searchTerm || statusFilter !== 'all' 
+                ? 'Try adjusting your search or filters'
+                : "No delivery assignments available at the moment."
+              }
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Delivery Management Modal */}
+      {selectedOrder && selectedOrderData && selectedCrop && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">Delivery Management</h2>
+                  <p className="text-gray-600">Order #{selectedOrderData.id}</p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  icon={<X size={16} />}
+                  onClick={() => setSelectedOrder(null)}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Order Details */}
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="font-medium text-gray-900 mb-3">Order Information</h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Order ID:</span>
+                        <span className="font-medium">#{selectedOrderData.id.substring(0, 8)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Crop:</span>
+                        <span className="font-medium">{selectedCrop.name}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Quantity:</span>
+                        <span className="font-medium">{selectedCrop.quantity} {selectedCrop.unit}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Buyer ID:</span>
+                        <span className="font-medium">{selectedOrderData.buyerId.substring(0, 8)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Total Amount:</span>
+                        <span className="font-semibold text-green-700">${selectedOrderData.totalAmount.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Current Status:</span>
+                        <StatusBadge status={selectedOrderData.status} />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="font-medium text-gray-900 mb-3">Crop Details</h3>
+                    <div className="flex items-start space-x-4">
+                      <img
+                        src={selectedCrop.images[0] || 'https://images.pexels.com/photos/601798/pexels-photo-601798.jpeg'}
+                        alt={selectedCrop.name}
+                        className="w-20 h-20 object-cover rounded-lg"
+                      />
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-900">{selectedCrop.name}</h4>
+                        <p className="text-gray-600 text-sm">{selectedCrop.description}</p>
+                        <div className="mt-2 text-sm">
+                          <p className="text-gray-500">Harvest Date: {new Date(selectedCrop.harvestDate).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Delivery Management */}
+                <div>
+                  <h3 className="font-medium text-gray-900 mb-3">Delivery Management</h3>
+                  <div className="space-y-4">
+                    <Select
+                      label="Delivery Status"
+                      options={[
+                        { value: 'assigned', label: 'Assigned - Ready for pickup' },
+                        { value: 'loaded', label: 'Loaded - Crop loaded for transport' },
+                        { value: 'in-transit', label: 'In Transit - On the way to buyer' },
+                        { value: 'delivered', label: 'Delivered - Completed' },
+                      ]}
+                      value={deliveryData.status}
+                      onChange={(e) => setDeliveryData(prev => ({ ...prev, status: e.target.value as any }))}
+                      fullWidth
+                    />
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <Input
+                        label="Pickup Date"
+                        type="date"
+                        value={deliveryData.pickupDate}
+                        onChange={(e) => setDeliveryData(prev => ({ ...prev, pickupDate: e.target.value }))}
+                        fullWidth
+                      />
+                      
+                      <Input
+                        label="Expected Delivery Date"
+                        type="date"
+                        value={deliveryData.deliveryDate}
+                        onChange={(e) => setDeliveryData(prev => ({ ...prev, deliveryDate: e.target.value }))}
+                        fullWidth
+                      />
+                    </div>
+
+                    <Textarea
+                      label="Delivery Notes"
+                      placeholder="Add notes about pickup location, delivery instructions, special handling requirements, etc."
+                      rows={4}
+                      value={deliveryData.notes}
+                      onChange={(e) => setDeliveryData(prev => ({ ...prev, notes: e.target.value }))}
+                      fullWidth
+                    />
+
+                    <div className="flex space-x-3 pt-4">
+                      <Button
+                        variant="outline"
+                        onClick={() => setSelectedOrder(null)}
+                        fullWidth
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="primary"
+                        onClick={handleUpdateDelivery}
+                        fullWidth
+                        icon={<Truck size={16} />}
+                      >
+                        Update Delivery Status
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
