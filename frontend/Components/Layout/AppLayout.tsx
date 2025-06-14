@@ -27,7 +27,6 @@ export const AppLayout: React.FC = () => {
     return location.pathname === path || location.pathname.startsWith(`${path}/`);
   };
 
-  // Navigation links based on user role
   const getNavLinks = () => {
     if (!user) return [];
     
@@ -65,7 +64,6 @@ export const AppLayout: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
@@ -122,7 +120,6 @@ export const AppLayout: React.FC = () => {
                 </div>
               )}
               
-              {/* Mobile menu button */}
               <div className="md:hidden flex items-center">
                 <button
                   onClick={toggleMobileMenu}
@@ -140,7 +137,6 @@ export const AppLayout: React.FC = () => {
           </div>
         </div>
         
-        {/* Mobile menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden">
             <div className="pt-2 pb-3 space-y-1">
@@ -203,14 +199,12 @@ export const AppLayout: React.FC = () => {
         )}
       </header>
       
-      {/* Main content */}
       <main className="flex-1">
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <Outlet />
         </div>
       </main>
       
-      {/* Footer */}
       <footer className="bg-white border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
