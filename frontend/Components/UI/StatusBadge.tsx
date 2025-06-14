@@ -31,7 +31,6 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, className = ''
   };
 
   const formatStatusLabel = (status: string) => {
-    // Convert 'in-transit' to 'In Transit'
     return status
       .split('-')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
