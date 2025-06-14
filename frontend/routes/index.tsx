@@ -21,7 +21,6 @@ import { AdminUsers } from '../pages/admin/AdminUsers';
 import { Inspections } from '../pages/agent/Inspections';
 import { Deliveries } from '../pages/agent/Deliveries';
 
-// Protected route component
 const ProtectedRoute: React.FC<{
   children: React.ReactNode;
   allowedRoles?: string[];
@@ -33,14 +32,12 @@ const ProtectedRoute: React.FC<{
   }
 
   if (allowedRoles.length > 0 && user && !allowedRoles.includes(user.role)) {
-    // Redirect to the appropriate dashboard based on role
     return <Navigate to={`/${user.role}/dashboard`} replace />;
   }
 
   return <>{children}</>;
 };
 
-// Router configuration
 const Routes: React.FC = () => {
   const router = createBrowserRouter([
     {
@@ -57,10 +54,9 @@ const Routes: React.FC = () => {
         },
         {
           path: "register",
-          element: <LoginPage /> // Using LoginPage for now
+          element: <LoginPage /> 
         },
         
-        // Farmer routes
         {
           path: "farmer",
           element: <ProtectedRoute allowedRoles={['farmer']}><Navigate to="/farmer/dashboard" replace /></ProtectedRoute>
@@ -90,7 +86,6 @@ const Routes: React.FC = () => {
           element: <ProtectedRoute><Profile /></ProtectedRoute>
         },
         
-        // Buyer routes
         {
           path: "buyer",
           element: <ProtectedRoute allowedRoles={['buyer']}><Navigate to="/buyer/dashboard" replace /></ProtectedRoute>
@@ -108,7 +103,6 @@ const Routes: React.FC = () => {
           element: <ProtectedRoute allowedRoles={['buyer']}><MyOrders /></ProtectedRoute>
         },
         
-        // Admin routes
         {
           path: "admin",
           element: <ProtectedRoute allowedRoles={['admin']}><Navigate to="/admin/dashboard" replace /></ProtectedRoute>
@@ -130,7 +124,6 @@ const Routes: React.FC = () => {
           element: <ProtectedRoute allowedRoles={['admin']}><AdminUsers /></ProtectedRoute>
         },
         
-        // Agent routes
         {
           path: "agent",
           element: <ProtectedRoute allowedRoles={['agent']}><Navigate to="/agent/dashboard" replace /></ProtectedRoute>
@@ -148,7 +141,6 @@ const Routes: React.FC = () => {
           element: <ProtectedRoute allowedRoles={['agent']}><Deliveries /></ProtectedRoute>
         },
         
-        // Fallback route
         {
           path: "*",
           element: <div className="flex items-center justify-center min-h-screen">
