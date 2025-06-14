@@ -45,7 +45,7 @@ export const BuyerProfile: React.FC = () => {
     },
   });
 
-  // Get buyer statistics
+  
   const buyerOrders = user ? orders.filter(order => order.buyerId === user.id) : [];
   const favoriteCrops = [...new Set(buyerOrders.map(order => crops.find(crop => crop.id === order.cropId)?.name).filter(Boolean))];
 
@@ -60,7 +60,7 @@ export const BuyerProfile: React.FC = () => {
   const onSubmit = async (data: ProfileFormData) => {
     setIsLoading(true);
     
-    // Simulate API call
+    
     setTimeout(() => {
       if (user) {
         setUser({
@@ -254,7 +254,7 @@ export const BuyerProfile: React.FC = () => {
             </Card>
           </Card>
 
-          {/* Achievements */}
+          
           <Card>
             <CardHeader>
               <CardTitle>Achievements & Milestones</CardTitle>
@@ -305,9 +305,9 @@ export const BuyerProfile: React.FC = () => {
           </Card>
         </div>
 
-        {/* Statistics Sidebar */}
+    
         <div className="space-y-6">
-          {/* Performance Stats */}
+   
           <Card>
             <CardHeader>
               <CardTitle>Purchase Overview</CardTitle>
@@ -340,7 +340,7 @@ export const BuyerProfile: React.FC = () => {
             </Card>
           </Card>
 
-          {/* Quick Actions */}
+     
           <Card>
             <CardHeader>
               <CardTitle>Quick Actions</CardTitle>
