@@ -18,7 +18,7 @@ export const AdminDashboard: React.FC = () => {
   const { crops } = useCropsStore();
   const { orders } = useOrdersStore();
   
-  // Calculate statistics
+
   const pendingCrops = crops.filter(crop => crop.status === 'pending').length;
   const approvedCrops = crops.filter(crop => ['approved', 'listed'].includes(crop.status)).length;
   const rejectedCrops = crops.filter(crop => crop.status === 'rejected').length;
