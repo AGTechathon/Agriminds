@@ -232,3 +232,254 @@ export const Inspections: React.FC = () => {
                         className="w-full h-full object-cover"
                       />
                     </div>
+{/* Crop Info */}
+                    <div className="flex-1">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3">
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900">{crop.name}</h3>
+                          <p className="text-gray-600 text-sm line-clamp-2">{crop.description}</p>
+                        </div>
+                        <StatusBadge status={crop.status} />
+                      </div>
+
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div className="flex items-center">
+                          <Package className="h-4 w-4 text-gray-400 mr-2" />
+                          <div>
+                            <p className="text-gray-500">Quantity</p>
+                            <p className="font-medium">{crop.quantity} {crop.unit}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center">
+                          <Calendar className="h-4 w-4 text-gray-400 mr-2" />
+                          <div>
+                            <p className="text-gray-500">Harvest Date</p>
+                            <p className="font-medium">{new Date(crop.harvestDate).toLocaleDateString()}</p>
+                          </div>
+                        </div>
+
+                        </div>
+                        )}
+
+                        <div className="flex items-center">
+                          <User className="h-4 w-4 text-gray-400 mr-2" />
+                          <div>
+                            <p className="text-gray-500">Farmer ID</p>
+                            <p className="font-medium">{crop.farmerId.substring(0, 8)}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex flex-row lg:flex-col gap-2 lg:w-32">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        icon={<Eye size={14} />}
+                        fullWidth
+                      >
+                        View Details
+                      </Button>
+                      
+                      {crop.status === 'pending' && (
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          icon={<CheckCircle size={14} />}
+                          onClick={() => handleStartInspection(crop.id)}
+                          fullWidth
+                        >
+                          Start Inspection
+                        </Button>
+                      )}
+
+                      {crop.status === 'inspected' && (
+                        <Button
+                          variant="success"
+                          size="sm"
+                          icon={<FileText size={14} />}
+                          fullWidth
+                        >
+                          View Report
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+      ) : (
+        <Card>
+          <CardContent className="p-12 text-center">
+            <Package className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No inspections found</h3>
+            <p className="text-gray-500">
+              {searchTerm || statusFilter !== 'all' 
+                ? 'Try adjusting your search or filters'
+                : "No crops available for inspection at the moment."
+              }
+            </p>
+          </CardContent>
+        </Card>
+      )}
+ {crop.price && (
+                          <div className="flex items-center">
+                            <span className="text-gray-400 mr-2">$</span>
+                            <div>
+                              <p className="text-gray-500">Price</p>
+                              <p className="font-medium">${crop.price} / {crop.unit}</p>
+                            </div>
+                         
+      {/* Inspection Modal */}
+      {selectedCrop && selectedCropData && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">Quality Inspection</h2>
+                  <p className="text-gray-600">{selectedCropData.name}</p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  icon={<X size={16} />}
+                  onClick={() => setSelectedCrop(null)}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Crop Details */}
+                <div>
+                  <h3 className="font-medium text-gray-900 mb-3">Crop Information</h3>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      {selectedCropData.images.map((image, index) => (
+                        <div key={index} className="aspect-square overflow-hidden rounded-lg">
+                          <img
+                            src={image}
+                            alt={`${selectedCropData.name} ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Name:</span>
+                        <span className="font-medium">{selectedCropData.name}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Quantity:</span>
+                        <span className="font-medium">{selectedCropData.quantity} {selectedCropData.unit}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Harvest Date:</span>
+                        <span className="font-medium">{new Date(selectedCropData.harvestDate).toLocaleDateString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Farmer ID:</span>
+                        <span className="font-medium">{selectedCropData.farmerId.substring(0, 8)}</span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-2">Description</h4>
+                      <p className="text-gray-600 text-sm">{selectedCropData.description}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Inspection Form */}
+                <div>
+                  <h3 className="font-medium text-gray-900 mb-3">Inspection Details</h3>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <Input
+                        label="Actual Weight"
+                        type="number"
+                        placeholder={selectedCropData.quantity.toString()}
+                        value={inspectionData.weight}
+                        onChange={(e) => setInspectionData(prev => ({ ...prev, weight: e.target.value }))}
+                        fullWidth
+                      />
+                      
+                      <Select
+                        label="Size Grade"
+                        options={[
+                          { value: 'Small', label: 'Small' },
+                          { value: 'Medium', label: 'Medium' },
+                          { value: 'Large', label: 'Large' },
+                          { value: 'Extra Large', label: 'Extra Large' },
+                        ]}
+                        value={inspectionData.size}
+                        onChange={(e) => setInspectionData(prev => ({ ...prev, size: e.target.value }))}
+                        fullWidth
+                      />
+                    </div>
+
+                    <Select
+                      label="Overall Condition"
+                      options={[
+                        { value: 'Excellent', label: 'Excellent' },
+                        { value: 'Good', label: 'Good' },
+                        { value: 'Fair', label: 'Fair' },
+                        { value: 'Poor', label: 'Poor' },
+                      ]}
+                      value={inspectionData.condition}
+                      onChange={(e) => setInspectionData(prev => ({ ...prev, condition: e.target.value }))}
+                      fullWidth
+                    />
+
+                    <Textarea
+                      label="Inspection Notes"
+                      placeholder="Detailed observations about the crop quality, appearance, freshness, etc."
+                      rows={4}
+                      value={inspectionData.notes}
+                      onChange={(e) => setInspectionData(prev => ({ ...prev, notes: e.target.value }))}
+                      fullWidth
+                    />
+
+                    <Select
+                      label="Recommendation"
+                      options={[
+                        { value: 'approve', label: 'Approve for Marketplace' },
+                        { value: 'reject', label: 'Reject - Does not meet standards' },
+                      ]}
+                      value={inspectionData.recommendation}
+                      onChange={(e) => setInspectionData(prev => ({ ...prev, recommendation: e.target.value as 'approve' | 'reject' }))}
+                      fullWidth
+                    />
+
+                    <div className="flex space-x-3 pt-4">
+                      <Button
+                        variant="outline"
+                        onClick={() => setSelectedCrop(null)}
+                        fullWidth
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant={inspectionData.recommendation === 'approve' ? 'success' : 'danger'}
+                        onClick={handleSubmitInspection}
+                        fullWidth
+                        disabled={!inspectionData.condition || !inspectionData.size}
+                      >
+                        Submit Inspection
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
