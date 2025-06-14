@@ -16,7 +16,7 @@ export const BuyerDashboard: React.FC = () => {
   const featuredCrops = crops.filter(crop => crop.status === 'listed').slice(0, 3);
   return(
     <div className="space-y-6">
-      {/* Welcome section */}
+     
       <div className="bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-lg p-6 shadow-md">
         <h1 className="text-2xl font-bold">Welcome, {user?.name}</h1>
         <p className="mt-2">Browse the freshest crops directly from farmers.</p>
@@ -28,7 +28,7 @@ export const BuyerDashboard: React.FC = () => {
           </Link>
         </div>
       </div>
-      {/* Stats cards */}
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -109,7 +109,7 @@ export const BuyerDashboard: React.FC = () => {
           </Card>
         </motion.div>
       </div>
-      {/* Featured crops */}
+ 
       <div>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Featured Crops</h2>
@@ -138,8 +138,7 @@ export const BuyerDashboard: React.FC = () => {
           )}
         </div>
       </div>
-      
-      {/* Recent orders */}
+  
       <Card>
         <CardHeader>
           <CardTitle>Recent Orders</CardTitle>
@@ -207,7 +206,7 @@ export const BuyerDashboard: React.FC = () => {
         )}
       </Card>
       
-      {/* Seasonal recommendations */}
+
       <Card>
         <CardHeader>
           <CardTitle>Seasonal Recommendations</CardTitle>
